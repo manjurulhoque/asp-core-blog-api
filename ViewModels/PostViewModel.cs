@@ -13,5 +13,6 @@ namespace blogapi.ViewModels
         public string Title { get; set; }
         [Required, Display(Name = "Post Description", Prompt = "Post Description")]
         public string Description { get; set; }
+		public DateTime CreatedAt { get; set; }
     }
 }

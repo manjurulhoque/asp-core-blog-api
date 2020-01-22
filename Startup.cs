@@ -38,6 +38,13 @@ namespace blogapi
 
             services.AddAutoMapper(typeof(Maps));
 
+            services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
+            {
+                builder.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader();
+            }));
+
             services.AddControllersWithViews();
         }
 
@@ -58,6 +65,9 @@ namespace blogapi
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            //app.UseCors(builder => builder.WithOrigins("http://localhost:4200"));
+            app.UseCors("MyPolicy");
 
             app.UseAuthorization();
 

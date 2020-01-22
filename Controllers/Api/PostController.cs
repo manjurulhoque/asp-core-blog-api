@@ -41,7 +41,7 @@ namespace blogapi.Controllers.Api
             return Ok(post);
         }
 
-        // POST api/post/{id}
+        // GET api/post/{id}
         [HttpGet("{id}")]
         public Post GetPost(int id)
         {

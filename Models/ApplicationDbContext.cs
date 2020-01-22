@@ -6,7 +6,7 @@ namespace blogapi.Models
     {
         public ApplicationDbContext(DbContextOptions options) : base(options)
         {
-            Database.EnsureCreated();
+            //Database.EnsureCreated();
         }
 
         public DbSet<Post> Posts { get; set; }
