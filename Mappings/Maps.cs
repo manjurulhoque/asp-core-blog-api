@@ -13,6 +13,7 @@ namespace blogapi.Mappings
         public Maps()
         {
             CreateMap<Post, PostViewModel>().ReverseMap();
+            CreateMap<User, RegisterModel>().ReverseMap();
         }
     }
 }

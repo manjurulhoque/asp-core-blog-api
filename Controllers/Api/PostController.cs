@@ -6,11 +6,13 @@ using AutoMapper;
 using blogapi.Contracts;
 using blogapi.Models;
 using blogapi.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace blogapi.Controllers.Api
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class PostController : ControllerBase
@@ -62,8 +64,10 @@ namespace blogapi.Controllers.Api
         [HttpDelete("{id}")]
         public IActionResult DetePost(int id)
         {
+            if (id <= 0)
+                return BadRequest("Not a valid post id");
             _repo.Delete(id);
-            return Ok("deleted");
+            return Ok();
         }
     }
 }
