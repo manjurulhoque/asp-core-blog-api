@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using blogapi.Contracts;
 using blogapi.Mappings;
@@ -15,6 +16,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using AutoMapper;
+using Microsoft.IdentityModel.Tokens;
 
 namespace blogapi
 {
@@ -45,6 +47,42 @@ namespace blogapi
                     .AllowAnyMethod()
                     .AllowAnyHeader();
             }));
+            
+            // configure jwt authentication
+            var appSettings = appSettingsSection.Get<AppSettings>();
+            var key = Encoding.ASCII.GetBytes(appSettings.Secret);
+            services.AddAuthentication(x =>
+                {
+                    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(x =>
+                {
+                    x.Events = new JwtBearerEvents
+                    {
+                        OnTokenValidated = context =>
+                        {
+                            var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
+                            var userId = int.Parse(context.Principal.Identity.Name);
+                            var user = userService.GetById(userId);
+                            if (user == null)
+                            {
+                                // return unauthorized if user no longer exists
+                                context.Fail("Unauthorized");
+                            }
+                            return Task.CompletedTask;
+                        }
+                    };
+                    x.RequireHttpsMetadata = false;
+                    x.SaveToken = true;
+                    x.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(key),
+                        ValidateIssuer = false,
+                        ValidateAudience = false
+                    };
+                });
 
             services.AddControllersWithViews();
         }
