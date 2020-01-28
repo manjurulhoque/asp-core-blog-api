@@ -35,7 +35,7 @@ namespace blogapi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<ApplicationDbContext>(x => x.
-                UseSqlite(Configuration.GetConnectionString("DefaultConnection"))
+                UseMySql(Configuration.GetConnectionString("DefaultConnection"))
                     .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.IncludeIgnoredWarning)));
 
             services.AddScoped<IPostRepository, PostRepository>();

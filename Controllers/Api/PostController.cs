@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using blogapi.Contracts;
@@ -18,14 +19,18 @@ namespace blogapi.Controllers.Api
     public class PostController : ControllerBase
     {
         private readonly IPostRepository _repo;
+        private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
-        public PostController(IPostRepository repo, IMapper mapper)
+
+        public PostController(IPostRepository repo, IMapper mapper, IUserRepository userRepository)
         {
             _repo = repo;
             _mapper = mapper;
+            _userRepository = userRepository;
         }
 
         // GET api/post
+        [AllowAnonymous]
         [HttpGet]
         public IEnumerable<PostViewModel> GetPosts()
         {
@@ -35,14 +40,28 @@ namespace blogapi.Controllers.Api
             return model;
         }
 
-        // POST api/post
-        [HttpPost]
-        public ActionResult<PostViewModel> AddPost([FromBody]Post post)
+        User GetSecureUser()
         {
-            _repo.Create(post);
-            return Ok(post);
+            var id = int.Parse(HttpContext.User.Claims.First().Value);
+            return _userRepository.GetById(id);
         }
 
+        // POST api/post
+        [HttpPost]
+        [AllowAnonymous]
+        public ActionResult<User> AddPost([FromBody] Post post)
+        {
+//             _repo.Create(post);
+            // var email = User.Claims.FirstOrDefault(c => c.Type == "sub").Value;
+            //var id = HttpContext.User.Claims.FirstOrDefault().Value;
+            //var user =  _authBusiness.GetUser(email);
+            //var id = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "sub").Value;
+            //System.Diagnostics.Debug.WriteLine(id);
+            var user = GetSecureUser();
+            return Ok(user);
+        }
+
+        [AllowAnonymous]
         // GET api/post/{id}
         [HttpGet("{id}")]
         public Post GetPost(int id)
@@ -51,12 +70,13 @@ namespace blogapi.Controllers.Api
         }
 
         [HttpPut("{id}")]
-        public ActionResult<Post> UpdatePost(int id, [FromBody]Post post)
+        public ActionResult<Post> UpdatePost(int id, [FromBody] Post post)
         {
             if (id != post.Id)
             {
                 return BadRequest();
             }
+
             _repo.Update(post);
             return Ok(post);
         }

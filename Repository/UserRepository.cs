@@ -42,7 +42,8 @@ namespace blogapi.Repository
 
         public User GetById(int id)
         {
-            throw new System.NotImplementedException();
+            //throw new System.NotImplementedException();
+            return _context.Users.FirstOrDefault(c => c.Id == id);
         }
 
         public User Register(User user, string password)

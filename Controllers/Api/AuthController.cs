@@ -8,6 +8,7 @@ using blogapi.Models;
 using blogapi.ViewModels;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 
@@ -18,12 +19,15 @@ namespace blogapi.Controllers.Api
     public class AuthController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
+
         private readonly IMapper _mapper;
+        //private readonly UserManager<User> _userManager;
 
         public AuthController(IUserRepository repo, IMapper mapper)
         {
             _userRepository = repo;
             _mapper = mapper;
+            //_userManager = userManager;
         }
 
         // POST /api/auth/register
@@ -53,33 +57,50 @@ namespace blogapi.Controllers.Api
         public IActionResult Authenticate([FromBody] RegisterModel model)
         {
             var user = _userRepository.Authenticate(model.Email, model.Password);
+//
+//            if (user == null)
+//                return BadRequest(new {message = "Email or password is incorrect"});
+//
+//            var tokenHandler = new JwtSecurityTokenHandler();
+//            var key = Encoding.ASCII.GetBytes("Secretttpassword");
+//            var tokenDescriptor = new SecurityTokenDescriptor
+//            {
+//                Subject = new ClaimsIdentity(new Claim[]
+//                {
+//                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+//                    new Claim(ClaimTypes.Email, user.Email)
+//                }),
+//                Expires = DateTime.UtcNow.AddDays(1),
+//                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
+//                    SecurityAlgorithms.HmacSha256Signature)
+//            };
+//            var token = tokenHandler.CreateToken(tokenDescriptor);
+//            var tokenString = tokenHandler.WriteToken(token);
 
-            if (user == null)
-                return BadRequest(new {message = "Email or password is incorrect"});
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes("Secretttpassword");
-            var tokenDescriptor = new SecurityTokenDescriptor
+            var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("this is the secret key"));
+            var signingCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
+            var claims = new Claim[]
             {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Name, user.Id.ToString()),
-                    new Claim(ClaimTypes.Email, user.Email)
-                }),
-                Expires = DateTime.UtcNow.AddDays(7),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
-                    SecurityAlgorithms.HmacSha256Signature)
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString())
             };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            var tokenString = tokenHandler.WriteToken(token);
+            var jwt = new JwtSecurityToken(claims: claims, signingCredentials: signingCredentials,
+                expires: DateTime.UtcNow.AddDays(1));
+            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
-            // return basic user info and authentication token
             return Ok(new
             {
                 Id = user.Id,
                 Username = user.Email,
-                Token = tokenString
+                Token = encodedJwt
             });
+
+            // return basic user info and authentication token
+//            return Ok(new
+//            {
+//                Id = user.Id,
+//                Username = user.Email,
+//                Token = tokenString
+//            });
         }
     }
 }
