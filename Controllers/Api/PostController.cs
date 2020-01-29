@@ -5,8 +5,11 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using blogapi.Contracts;
+using blogapi.Contracts.Requests;
+using blogapi.Extensions;
 using blogapi.Models;
 using blogapi.ViewModels;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -48,17 +51,22 @@ namespace blogapi.Controllers.Api
 
         // POST api/post
         [HttpPost]
-        [AllowAnonymous]
-        public ActionResult<User> AddPost([FromBody] Post post)
+        public CreatePostRequest AddPost([FromBody] CreatePostRequest postRequest)
         {
-//             _repo.Create(post);
+            var post = new Post
+            {
+                Title = postRequest.Title,
+                Description = postRequest.Description,
+                UserId = HttpContext.GetCurrentUserId()
+            };
+            _repo.Create(post);
             // var email = User.Claims.FirstOrDefault(c => c.Type == "sub").Value;
             //var id = HttpContext.User.Claims.FirstOrDefault().Value;
             //var user =  _authBusiness.GetUser(email);
             //var id = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "sub").Value;
             //System.Diagnostics.Debug.WriteLine(id);
-            var user = GetSecureUser();
-            return Ok(user);
+            //var user = GetSecureUser();
+            return postRequest;
         }
 
         [AllowAnonymous]

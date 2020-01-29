@@ -57,50 +57,53 @@ namespace blogapi.Controllers.Api
         public IActionResult Authenticate([FromBody] RegisterModel model)
         {
             var user = _userRepository.Authenticate(model.Email, model.Password);
-//
-//            if (user == null)
-//                return BadRequest(new {message = "Email or password is incorrect"});
-//
-//            var tokenHandler = new JwtSecurityTokenHandler();
-//            var key = Encoding.ASCII.GetBytes("Secretttpassword");
-//            var tokenDescriptor = new SecurityTokenDescriptor
-//            {
-//                Subject = new ClaimsIdentity(new Claim[]
-//                {
-//                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-//                    new Claim(ClaimTypes.Email, user.Email)
-//                }),
-//                Expires = DateTime.UtcNow.AddDays(1),
-//                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
-//                    SecurityAlgorithms.HmacSha256Signature)
-//            };
-//            var token = tokenHandler.CreateToken(tokenDescriptor);
-//            var tokenString = tokenHandler.WriteToken(token);
 
-            var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("this is the secret key"));
-            var signingCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
-            var claims = new Claim[]
+            if (user == null)
+                return BadRequest(new {message = "Email or password is incorrect"});
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes("Secretttpassword");
+            var tokenDescriptor = new SecurityTokenDescriptor
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString())
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                    new Claim("Id", user.Id.ToString())
+                    // new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    // new Claim(ClaimTypes.Email, user.Email)
+                }),
+                Expires = DateTime.UtcNow.AddDays(3),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
+                    SecurityAlgorithms.HmacSha256Signature)
             };
-            var jwt = new JwtSecurityToken(claims: claims, signingCredentials: signingCredentials,
-                expires: DateTime.UtcNow.AddDays(1));
-            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            var tokenString = tokenHandler.WriteToken(token);
 
+            // var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("this is the secret key"));
+            // var signingCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
+            // var claims = new Claim[]
+            // {
+            //     new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+            //     new Claim("Id", user.Id.ToString())
+            // };
+            // var jwt = new JwtSecurityToken(claims: claims, signingCredentials: signingCredentials,
+            //     expires: DateTime.UtcNow.AddDays(1));
+            // var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
+            //
+            // return Ok(new
+            // {
+            //     Id = user.Id,
+            //     Username = user.Email,
+            //     Token = encodedJwt
+            // });
+
+            // return basic user info and authentication token
             return Ok(new
             {
                 Id = user.Id,
                 Username = user.Email,
-                Token = encodedJwt
+                Token = tokenString
             });
-
-            // return basic user info and authentication token
-//            return Ok(new
-//            {
-//                Id = user.Id,
-//                Username = user.Email,
-//                Token = tokenString
-//            });
         }
     }
 }

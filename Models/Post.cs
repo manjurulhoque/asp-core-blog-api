@@ -16,6 +16,8 @@ namespace blogapi.Models
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
+        public int UserId { get; set; }
+
         public User User { get; set; }
     }
 }
