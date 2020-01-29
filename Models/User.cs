@@ -8,7 +8,7 @@ namespace blogapi.Models
     {
         [Key]
         public int Id { get; set; }
-        [EmailAddress] public string Email { get; set; }
+        [EmailAddress] [MaxLength(100)] public string Email { get; set; }
         public byte[] PasswordHash { get; set; }
         public byte[] PasswordSalt { get; set; }
 

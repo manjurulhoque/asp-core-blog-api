@@ -9,7 +9,7 @@ using blogapi.Models;
 namespace blogapi.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200129064953_InitialMigration")]
+    [Migration("20200129102133_InitialMigration")]
     partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,7 +54,8 @@ namespace blogapi.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Email")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("varchar(100) CHARACTER SET utf8mb4")
+                        .HasMaxLength(100);
 
                     b.Property<byte[]>("PasswordHash")
                         .HasColumnType("longblob");

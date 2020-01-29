@@ -52,7 +52,8 @@ namespace blogapi.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Email")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("varchar(100) CHARACTER SET utf8mb4")
+                        .HasMaxLength(100);
 
                     b.Property<byte[]>("PasswordHash")
                         .HasColumnType("longblob");
