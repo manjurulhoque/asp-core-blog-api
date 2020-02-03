@@ -16,7 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace blogapi.Controllers.Api
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
     [ApiController]
     public class PostController : ControllerBase
