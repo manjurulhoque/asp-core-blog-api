@@ -5,11 +5,11 @@ namespace blogapi.Extensions
 {
     public static class GeneralExtensions
     {
-        public static int GetCurrentUserId(this HttpContext httpContext)
+        public static string GetCurrentUserId(this HttpContext httpContext)
         {
-            if (httpContext.User == null) return 0;
+            if (httpContext.User == null) return string.Empty;
 
-            return int.Parse(httpContext.User.Claims.Single(x => x.Type == "id").Value);
+            return httpContext.User.Claims.Single(x => x.Type == "id").Value;
         }
     }
 }

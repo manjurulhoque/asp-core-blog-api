@@ -8,11 +8,11 @@ namespace blogapi.Contracts
     public interface IRepositoryBase<T> where T : class
     {
         ICollection<T> FindAll();
-        T FindById(int id);
-        bool isExists(int id);
+        T FindById(Guid id);
+        bool isExists(Guid id);
         bool Create(T entity);
         bool Update(T entity);
-        bool Delete(int id);
+        bool Delete(Guid id);
         bool Save();
     }
 }

@@ -43,12 +43,6 @@ namespace blogapi.Controllers.Api
             return model;
         }
 
-        User GetSecureUser()
-        {
-            var id = int.Parse(HttpContext.User.Claims.First().Value);
-            return _userRepository.GetById(id);
-        }
-
         // POST api/post
         [HttpPost]
         public CreatePostRequest AddPost([FromBody] CreatePostRequest postRequest)
@@ -72,13 +66,13 @@ namespace blogapi.Controllers.Api
         [AllowAnonymous]
         // GET api/post/{id}
         [HttpGet("{id}")]
-        public Post GetPost(int id)
+        public Post GetPost(Guid id)
         {
             return _repo.FindById(id);
         }
 
         [HttpPut("{id}")]
-        public ActionResult<Post> UpdatePost(int id, [FromBody] Post post)
+        public ActionResult<Post> UpdatePost(Guid id, [FromBody] Post post)
         {
             if (id != post.Id)
             {
@@ -90,10 +84,8 @@ namespace blogapi.Controllers.Api
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DetePost(int id)
+        public IActionResult DeletePost(Guid id)
         {
-            if (id <= 0)
-                return BadRequest("Not a valid post id");
             _repo.Delete(id);
             return Ok();
         }

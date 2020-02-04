@@ -9,7 +9,7 @@ using blogapi.Models;
 namespace blogapi.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200203200504_InitialMigration")]
+    [Migration("20200204053122_InitialMigration")]
     partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -217,9 +217,9 @@ namespace blogapi.Migrations
 
             modelBuilder.Entity("blogapi.Models.Post", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("char(36)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
@@ -233,35 +233,12 @@ namespace blogapi.Migrations
                         .HasColumnType("varchar(255) CHARACTER SET utf8mb4")
                         .HasMaxLength(255);
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<string>("UserId")
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Posts");
-                });
-
-            modelBuilder.Entity("blogapi.Models.User", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("varchar(100) CHARACTER SET utf8mb4")
-                        .HasMaxLength(100);
-
-                    b.Property<byte[]>("PasswordHash")
-                        .HasColumnType("longblob");
-
-                    b.Property<byte[]>("PasswordSalt")
-                        .HasColumnType("longblob");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -310,15 +287,6 @@ namespace blogapi.Migrations
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
                         .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("blogapi.Models.Post", b =>
-                {
-                    b.HasOne("blogapi.Models.User", "User")
-                        .WithMany("Posts")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

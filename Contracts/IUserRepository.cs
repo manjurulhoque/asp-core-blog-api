@@ -1,15 +1,14 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using blogapi.Contracts.Responses;
 using blogapi.Models;
 
 namespace blogapi.Contracts
 {
     public interface IUserRepository
     {
-        User Authenticate(string username, string password);
-        IEnumerable<User> GetAll();
-        User GetById(int id);
-        User Register(User user, string password);
-        void Update(User user, string password = null);
-        void Delete(int id);
+        Task<AuthenticationResult> RegisterAsync(string email, string password);
+        
+        Task<AuthenticationResult> LoginAsync(string email, string password);
     }
 }

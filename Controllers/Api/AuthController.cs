@@ -1,16 +1,10 @@
-﻿using System;
-using System.Security.Claims;
-using System.Text;
+﻿using System.Linq;
 using AutoMapper;
 using blogapi.Contracts;
-using blogapi.Helpers;
-using blogapi.Models;
-using blogapi.ViewModels;
-using System.IdentityModel.Tokens.Jwt;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
+using System.Threading.Tasks;
+using blogapi.Contracts.Requests;
+using blogapi.Contracts.Responses;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 
 namespace blogapi.Controllers.Api
 {
@@ -29,79 +23,50 @@ namespace blogapi.Controllers.Api
             _mapper = mapper;
             //_userManager = userManager;
         }
-
-        // POST /api/auth/register
-        [AllowAnonymous]
-        [HttpPost]
-        [Route("register")]
-        public IActionResult Register([FromBody] RegisterModel model)
+        
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] UserRegistrationRequest request)
         {
-            // map model to entity
-            var user = _mapper.Map<User>(model);
-
-            try
+            if (!ModelState.IsValid)
             {
-                // create user
-                _userRepository.Register(user, model.Password);
-                return Ok(user);
-            }
-            catch (AppException ex)
-            {
-                // return error message if there was an exception
-                return BadRequest(new {message = ex.Message});
-            }
-        }
-
-        [AllowAnonymous]
-        [HttpPost("login")]
-        public IActionResult Authenticate([FromBody] RegisterModel model)
-        {
-            var user = _userRepository.Authenticate(model.Email, model.Password);
-
-            if (user == null)
-                return BadRequest(new {message = "Email or password is incorrect"});
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes("Secretttpassword");
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[]
+                return BadRequest(new AuthFailedResponse
                 {
-                    new Claim("Id", user.Id.ToString())
-                    // new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                    // new Claim(ClaimTypes.Email, user.Email)
-                }),
-                Expires = DateTime.UtcNow.AddDays(3),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
-                    SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            var tokenString = tokenHandler.WriteToken(token);
+                    Errors = ModelState.Values.SelectMany(x => x.Errors.Select(xx => xx.ErrorMessage))
+                });
+            }
+            
+            var authResponse = await _userRepository.RegisterAsync(request.Email, request.Password);
 
-            // var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("this is the secret key"));
-            // var signingCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
-            // var claims = new Claim[]
-            // {
-            //     new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-            //     new Claim("Id", user.Id.ToString())
-            // };
-            // var jwt = new JwtSecurityToken(claims: claims, signingCredentials: signingCredentials,
-            //     expires: DateTime.UtcNow.AddDays(1));
-            // var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
-            //
-            // return Ok(new
-            // {
-            //     Id = user.Id,
-            //     Username = user.Email,
-            //     Token = encodedJwt
-            // });
-
-            // return basic user info and authentication token
-            return Ok(new
+            if (!authResponse.Success)
             {
-                Id = user.Id,
-                Username = user.Email,
-                Token = tokenString
+                return BadRequest(new AuthFailedResponse
+                {
+                    Errors = authResponse.Errors
+                });
+            }
+            
+            return Ok(new AuthSuccessResponse
+            {
+                Token = authResponse.Token,
+            });
+        }
+        
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] UserLoginRequest request)
+        {
+            var authResponse = await _userRepository.LoginAsync(request.Email, request.Password);
+
+            if (!authResponse.Success)
+            {
+                return BadRequest(new AuthFailedResponse
+                {
+                    Errors = authResponse.Errors
+                });
+            }
+            
+            return Ok(new AuthSuccessResponse
+            {
+                Token = authResponse.Token,
             });
         }
     }

@@ -29,7 +29,7 @@ namespace blogapi.Repository
             return Save();
         }
 
-        public bool Delete(int id)
+        public bool Delete(Guid id)
         {
             var post = FindById(id);
             _context.Posts.Remove(post);
@@ -37,12 +37,12 @@ namespace blogapi.Repository
             return Save();
         }
 
-        public Post FindById(int id)
+        public Post FindById(Guid id)
         {
             return _context.Posts.FirstOrDefault(x => x.Id == id);
         }
 
-        public bool isExists(int id)
+        public bool isExists(Guid id)
         {
             throw new NotImplementedException();
         }
