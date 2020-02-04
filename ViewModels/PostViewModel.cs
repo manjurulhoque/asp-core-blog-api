@@ -8,10 +8,8 @@ namespace blogapi.ViewModels
 {
     public class PostViewModel
     {
-        public int Id { get; set; }
-        [Required, MaxLength(255), Display(Name = "Post Title", Prompt = "Post Title")]
+        public Guid Id { get; set; }
         public string Title { get; set; }
-        [Required, Display(Name = "Post Description", Prompt = "Post Description")]
         public string Description { get; set; }
 		public DateTime CreatedAt { get; set; }
     }
