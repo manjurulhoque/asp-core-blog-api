@@ -9,7 +9,7 @@ using blogapi.Models;
 namespace blogapi.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200204053122_InitialMigration")]
+    [Migration("20200204074950_InitialMigration")]
     partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -236,9 +236,28 @@ namespace blogapi.Migrations
                     b.Property<string>("UserId")
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
+                    b.Property<Guid?>("UserId1")
+                        .HasColumnType("char(36)");
+
                     b.HasKey("Id");
 
+                    b.HasIndex("UserId1");
+
                     b.ToTable("Posts");
+                });
+
+            modelBuilder.Entity("blogapi.ViewModels.UserViewModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UserViewModel");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -290,6 +309,13 @@ namespace blogapi.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("blogapi.Models.Post", b =>
+                {
+                    b.HasOne("blogapi.ViewModels.UserViewModel", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId1");
                 });
 #pragma warning restore 612, 618
         }

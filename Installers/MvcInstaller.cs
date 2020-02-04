@@ -24,6 +24,7 @@ namespace blogapi.Installers
             services.AddSingleton(jwtSettings);
 
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<ICommentRepository, CommentRepository>();
 
             services
                 .AddMvc(options => { options.EnableEndpointRouting = false; })

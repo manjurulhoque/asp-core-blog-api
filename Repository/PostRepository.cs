@@ -19,7 +19,7 @@ namespace blogapi.Repository
 
         public ICollection<Post> FindAll()
         {
-            return _context.Posts.ToList();
+            return _context.Posts.Include(x => x.User).ToList();
         }
 
         public bool Create(Post entity)
@@ -39,7 +39,9 @@ namespace blogapi.Repository
 
         public Post FindById(Guid id)
         {
-            return _context.Posts.FirstOrDefault(x => x.Id == id);
+            return _context.Posts
+                .Include(x => x.User)
+                .FirstOrDefault(x => x.Id == id);
         }
 
         public bool isExists(Guid id)

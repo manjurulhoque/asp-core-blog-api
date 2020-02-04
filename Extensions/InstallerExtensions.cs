@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
-using blogapi;
+using blogapi.Installers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace blogapi.Installers
+namespace blogapi.Extensions
 {
     public static class InstallerExtensions
     {

@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using blogapi.ViewModels;
 using Microsoft.AspNetCore.Identity;
 
 namespace blogapi.Models
@@ -18,5 +20,9 @@ namespace blogapi.Models
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         public string UserId { get; set; }
+        
+        public IdentityUser User { get; set; }
+        
+        public ICollection<Comment> Comments { get; set; }
     }
 }

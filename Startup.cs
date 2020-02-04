@@ -1,16 +1,11 @@
-using System;
-using System.Text;
-using blogapi.Contracts;
 using blogapi.Mappings;
-using blogapi.Models;
-using blogapi.Repository;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using AutoMapper;
-using blogapi.Installers;
+using blogapi.Extensions;
 
 namespace blogapi
 {

@@ -14,6 +14,7 @@ namespace blogapi.Mappings
         {
             CreateMap<Post, PostViewModel>().ReverseMap();
             CreateMap<User, RegisterModel>().ReverseMap();
+            CreateMap<User, UserViewModel>().ReverseMap();
         }
     }
 }

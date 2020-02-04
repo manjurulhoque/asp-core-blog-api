@@ -35,6 +35,7 @@ namespace blogapi.Controllers.Api
         // GET api/post
         [AllowAnonymous]
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public IEnumerable<PostViewModel> GetPosts()
         {
             var posts = _repo.FindAll().ToList();
@@ -66,6 +67,8 @@ namespace blogapi.Controllers.Api
         [AllowAnonymous]
         // GET api/post/{id}
         [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public Post GetPost(Guid id)
         {
             return _repo.FindById(id);
